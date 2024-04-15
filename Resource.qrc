@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/Poem">
+        <file>poem.json</file>
+    </qresource>
+    <qresource prefix="/Icon"/>
+</RCC>

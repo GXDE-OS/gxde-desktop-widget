@@ -5,6 +5,15 @@
 #include <QTimer>
 #include <QScreen>
 
+// 用于一言信息获取
+#include <QUrlQuery>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QNetworkAccessManager>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 // 用于钟表绘制
 #include <QPainter>
 #include <QDateTime>
@@ -37,13 +46,28 @@ MainWindow::MainWindow(QWidget *parent)
     this->resize(window_width, window_height);
     this->move(window_x, window_y);
 
-
-    QTimer *dataUpdate = new QTimer();
+    // 钟表与时间绘制
+    dataUpdate = new QTimer();
     dataUpdate->setInterval(200);  // 钟表刷新次数
     connect(dataUpdate, &QTimer::timeout, this, &MainWindow::UpdateInformation);
     dataUpdate->start();
 
+    // 一言绘制
+    sentence = new QTimer();
+    sentence->setInterval(60 * 1000);
+    connect(sentence, &QTimer::timeout, this, &MainWindow::UpdateSentence);
+    sentence->start();
+
     ui->clockDrawing->installEventFilter(this);
+
+    // 读取离线词库
+    QFile sentence(":/Poem/poem.json");
+    sentence.open(QFile::ReadOnly);
+    offLineSentence = QJsonDocument::fromJson(sentence.readAll()).array();
+    offLineSentence_count = offLineSentence.count(); // 提前计算数据以减少损耗
+    sentence.close();
+
+    UpdateSentence();
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
@@ -76,6 +100,7 @@ void MainWindow::DrawingClock()
     // 设置控件尺寸
     ui->clockDrawing->setMaximumWidth(ui->clockDrawing->height());
     QPainter painter(ui->clockDrawing);
+    QPen pen = painter.pen();
     //painter.setPen(QPen(Qt::red, 10));
     int width = ui->clockDrawing->width();
     int height = ui->clockDrawing->height();
@@ -99,16 +124,22 @@ void MainWindow::DrawingClock()
     double minute = nowTime.time().minute() + second / 60.0;
     double hour = nowTime.time().hour() + minute / 60.0;
     // 绘制秒针
+    pen.setWidth(1);
+    painter.setPen(pen);
     QList<int> secondPoint = GetCoordinateOnCircularArc(DegreeToRadian(second * 360.0 / 60), r * 0.9);
     painter.drawLine(QPoint(centerPoint_X, centerPoint_Y),
                      QPoint(centerPoint_X + secondPoint.at(0), centerPoint_Y + secondPoint.at(1))
                      );
     // 绘制分针
+    pen.setWidth(3);
+    painter.setPen(pen);
     QList<int> minutePoint = GetCoordinateOnCircularArc(DegreeToRadian(minute * 360.0 / 60), r * 0.7);
     painter.drawLine(QPoint(centerPoint_X, centerPoint_Y),
                      QPoint(centerPoint_X + minutePoint.at(0), centerPoint_Y + minutePoint.at(1))
                      );
     // 绘制时针
+    pen.setWidth(5);
+    painter.setPen(pen);
     QList<int> hourPoint = GetCoordinateOnCircularArc(DegreeToRadian(hour * 360.0 / 12), r * 0.5);
     painter.drawLine(QPoint(centerPoint_X, centerPoint_Y),
                      QPoint(centerPoint_X + hourPoint.at(0), centerPoint_Y + hourPoint.at(1))
@@ -139,6 +170,95 @@ QList<int> MainWindow::GetCoordinateOnCircularArc(double angle, double r)
     coordinate.append(x);
     coordinate.append(y);
     return coordinate;
+}
+
+void MainWindow::UpdateSentence()
+{
+    ChangePoem();
+}
+
+void MainWindow::ChangePoem()
+{
+    QUrl url("https://v1.hitokoto.cn/?c=d&c=i&c=k");
+    QUrlQuery query;
+    query.addQueryItem("type", "DESKDICT");
+    query.addQueryItem("c", "d");
+    query.addQueryItem("c", "i");
+    query.addQueryItem("c", "k");
+    query.addQueryItem("num", "4");
+    query.addQueryItem("ver", "2.0");
+    query.addQueryItem("le", "eng");
+    query.addQueryItem("doctype", "json");
+    url.setQuery(query.toString(QUrl::FullyEncoded));
+    qDebug() << url;
+    QNetworkRequest request(url);
+    QNetworkAccessManager *m_http = new QNetworkAccessManager(this);
+    QNetworkReply *reply = m_http->get(request);
+    connect(reply, &QNetworkReply::finished, this, [this, m_http](){
+        QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << reply->errorString();
+            GetSentenceOffLine(); // 如果无法访问则使用离线数据库
+            return;
+        }
+        QByteArray data = reply->readAll();
+        qDebug() << data;
+        // 解析数据
+        // 数据例子：
+        /*
+        {
+            "id": 6256,
+            "uuid": "b2f3834f-5f52-4b62-bb3c-f9fb98901419",
+            "hitokoto": "我们在努力扩大自己，以靠近，以触及我们自身以外的世界。",
+            "type": "k",
+            "from": "豪尔赫·路易斯·博尔赫斯",
+            "from_who": "博尔赫斯谈话录",
+            "creator": "Irony",
+            "creator_uid": 4464,
+            "reviewer": 1044,
+            "commit_from": "web",
+            "created_at": "1592126239",
+            "length": 27
+        }*/
+        QJsonDocument document = QJsonDocument::fromJson(data);
+        QJsonObject object = document.object();
+        QJsonValue hitokoto = object.value("hitokoto");
+        QJsonValue from = object.value("from");
+        QJsonValue from_who = object.value("from_who");
+        this->ShowPoemText(hitokoto, from, from_who);
+        delete m_http;
+    });
+}
+
+void MainWindow::GetSentenceOffLine()
+{
+    // 通过随机数随机选择句子
+    srand(time(0)); // 使用时间种子
+    int id = rand() % (offLineSentence_count - 1) + 1;
+    QJsonObject object = offLineSentence.at(id).toObject();
+    QJsonValue hitokoto = object.value("hitokoto");
+    QJsonValue from = object.value("from");
+    QJsonValue from_who = object.value("from_who");
+    this->ShowPoemText(hitokoto, from, from_who);
+}
+
+void MainWindow::ShowPoemText(QJsonValue hitokoto, QJsonValue from, QJsonValue from_who)
+{
+    // 显示文本
+    QString showText = "<p>" + hitokoto.toString() + "</p><p align='right'>";
+    QString who = "";
+    if (!from.isNull()) {
+        who += "《" + from.toString() + "》";
+    }
+    if (!from_who.isNull()) {
+        who += from_who.toString();
+    }
+    if (who.length() > 0) {
+        // 有内容，添加破折号
+        who = "——" + who;
+    }
+    showText += who + "</p>";
+    ui->sentenceText->setText(showText);
 }
 
 MainWindow::~MainWindow()
