@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QTimer>
+#include <QScreen>
 
 // 用于钟表绘制
 #include <QPainter>
@@ -13,12 +14,30 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#define WindowWidthProportion 5
+#define WindowHeightProportion 4
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    qDebug() << GetCoordinateOnCircularArc(DegreeToRadian(30), 5);
+
+    // 隐藏标题栏
+    this->setWindowFlags(Qt::FramelessWindowHint);
+
+    // 获取屏幕分辨率以设置窗口大小
+    QScreen *screen = QGuiApplication::primaryScreen();  // 读取主窗口的分辨率
+    int screen_width = screen->geometry().width();
+    int screen_height = screen->geometry().height();
+    int window_width = screen_width / WindowWidthProportion * 0.96;
+    int window_height = screen_height / WindowHeightProportion * 0.96;
+    int window_x = screen_width * (WindowWidthProportion - 1) / WindowWidthProportion + screen_width / WindowWidthProportion * 0.02;
+    int window_y = screen_height / WindowHeightProportion * 0.02;
+    this->resize(window_width, window_height);
+    this->move(window_x, window_y);
+
+
     QTimer *dataUpdate = new QTimer();
     dataUpdate->setInterval(200);  // 钟表刷新次数
     connect(dataUpdate, &QTimer::timeout, this, &MainWindow::UpdateInformation);
@@ -49,7 +68,7 @@ void MainWindow::UpdateInformation()
 void MainWindow::UpdateTime()
 {
     QDateTime nowTime = QDateTime::currentDateTime();
-    ui->timeNumber->setText("<h1 align=center>" + nowTime.toString("hh:mm:ss") + "</h1><h3 align=center>" + nowTime.toString("yyyy") + "</h3>");
+    ui->timeNumber->setText("<h1 align=center>" + nowTime.toString("hh:mm:ss") + "</h1><h3 align=center>" + nowTime.toString("yyyy/MM/dd dddd") + "</h3>");
 }
 
 void MainWindow::DrawingClock()
