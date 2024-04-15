@@ -7,6 +7,7 @@
 // 用于钟表绘制
 #include <QPainter>
 #include <QDateTime>
+#include <QThread>
 
 // 引用数学库
 #define _USE_MATH_DEFINES
@@ -17,11 +18,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //qDebug() << ui->clockDrawing->height();
-    //ui->clockDrawing->setMaximumWidth(ui->clockDrawing->sizeHint().height());
     qDebug() << GetCoordinateOnCircularArc(DegreeToRadian(30), 5);
     QTimer *dataUpdate = new QTimer();
-    dataUpdate->setInterval(10);
+    dataUpdate->setInterval(200);  // 钟表刷新次数
     connect(dataUpdate, &QTimer::timeout, this, &MainWindow::UpdateInformation);
     dataUpdate->start();
 
@@ -41,8 +40,16 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 
 void MainWindow::UpdateInformation()
 {
+    // 刷新钟表
     ui->clockDrawing->repaint();
-    //DrawingClock();
+    // 更新日期
+    UpdateTime();
+}
+
+void MainWindow::UpdateTime()
+{
+    QDateTime nowTime = QDateTime::currentDateTime();
+    ui->timeNumber->setText("<h1 align=center>" + nowTime.toString("hh:mm:ss") + "</h1><h3 align=center>" + nowTime.toString("yyyy") + "</h3>");
 }
 
 void MainWindow::DrawingClock()
@@ -68,9 +75,10 @@ void MainWindow::DrawingClock()
     }
     // 获取当前时间
     QDateTime nowTime = QDateTime::currentDateTime();
-    int second = nowTime.time().second();
-    int minute = nowTime.time().minute();
-    int hour = nowTime.time().hour();
+    int minsecond = nowTime.time().msec();
+    double second = nowTime.time().second() + minsecond / 1000.0;
+    double minute = nowTime.time().minute() + second / 60.0;
+    double hour = nowTime.time().hour() + minute / 60.0;
     // 绘制秒针
     QList<int> secondPoint = GetCoordinateOnCircularArc(DegreeToRadian(second * 360.0 / 60), r * 0.9);
     painter.drawLine(QPoint(centerPoint_X, centerPoint_Y),

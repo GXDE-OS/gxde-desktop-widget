@@ -20,6 +20,7 @@ private:
     Ui::MainWindow *ui;
     void UpdateInformation();
     void DrawingClock();
+    void UpdateTime();
     // 数学计算
     QList<int> GetCoordinateOnCircularArc(double angle, double r);
     double DegreeToRadian(double degree);
