@@ -14,6 +14,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+// 用于获取系统硬件占用率
+#include "infoutils.h"
+
 // 用于钟表绘制
 #include <QPainter>
 #include <QDateTime>
@@ -23,7 +26,7 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#define WindowWidthProportion 5
+#define WindowWidthProportion 4
 #define WindowHeightProportion 4
 
 MainWindow::MainWindow(QWidget *parent)
@@ -44,7 +47,14 @@ MainWindow::MainWindow(QWidget *parent)
     int window_x = screen_width * (WindowWidthProportion - 1) / WindowWidthProportion + screen_width / WindowWidthProportion * 0.02;
     int window_y = screen_height / WindowHeightProportion * 0.02;
     this->resize(window_width, window_height);
+    this->setMaximumWidth(window_width);
     this->move(window_x, window_y);
+
+    // 资源占用率更新
+    systemResourceUpdater = new QTimer();
+    systemResourceUpdater->setInterval(2000);
+    connect(systemResourceUpdater, &QTimer::timeout, this, &MainWindow::UpdateSystemDeviceResouce);
+    systemResourceUpdater->start();
 
     // 钟表与时间绘制
     dataUpdate = new QTimer();
@@ -67,7 +77,9 @@ MainWindow::MainWindow(QWidget *parent)
     offLineSentence_count = offLineSentence.count(); // 提前计算数据以减少损耗
     sentence.close();
 
+    UpdateSystemDeviceResouce();
     UpdateSentence();
+
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
@@ -87,6 +99,25 @@ void MainWindow::UpdateInformation()
     ui->clockDrawing->repaint();
     // 更新日期
     UpdateTime();
+}
+
+void MainWindow::UpdateSystemDeviceResouce()
+{
+    // CPU
+    long cpuAll = 0;
+    long cpuFree = 0;
+    infoUtils::cpuRate(cpuAll, cpuFree);
+    ui->m_cpuProgressBar->setValue((((cpuAll - m_cpuAll) - (cpuFree - m_cpuFree)) * 100.0 / (cpuAll - m_cpuAll)));
+
+    m_cpuAll = cpuAll;
+    m_cpuFree = cpuFree;
+    // 内存
+    long memory = 0;
+    long memoryAll = 0;
+    long swap = 0;
+    long swapAll = 0;
+    infoUtils::memoryRate(memory, memoryAll, swap, swapAll);
+    ui->m_memoryProgressBar->setValue(memory * 100.0 / memoryAll);
 }
 
 void MainWindow::UpdateTime()

@@ -21,9 +21,13 @@ private:
     Ui::MainWindow *ui;
     QTimer *dataUpdate;
     QTimer *sentence;
+    QTimer *systemResourceUpdater;
+    long m_cpuAll;
+    long m_cpuFree;
     void UpdateInformation();
     void DrawingClock();
     void UpdateTime();
+    void UpdateSystemDeviceResouce();
     void UpdateSentence();
     // 一言
     void ChangePoem();
