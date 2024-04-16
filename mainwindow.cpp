@@ -22,6 +22,10 @@
 #include <QDateTime>
 #include <QThread>
 
+// 用于获取天气
+#include "weatherinformation.h"
+#include <QMessageBox>
+
 // 引用数学库
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -85,6 +89,12 @@ MainWindow::MainWindow(QWidget *parent)
     UpdateSystemDeviceResouce();
     UpdateSentence();
 
+    information = new WeatherInformation();
+    connect(information, &WeatherInformation::loadFinished, this, [this](){
+         qDebug() << this->information->current_weatherDesc();
+         //QMessageBox::information(NULL, "a", this->information->current_weatherDesc());
+    });
+    information->LoadInformation();
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {

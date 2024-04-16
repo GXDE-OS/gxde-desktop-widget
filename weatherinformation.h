@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QNetworkReply>
 
+
 class WeatherInformation : public QObject
 {
     Q_OBJECT
@@ -14,7 +15,9 @@ public:
     WeatherInformation();
     void LoadInformation();
     QJsonObject GetCurrentWeatherData() const;
-    QString current_temp_C() const;
+   int current_temp_C() const;
+   QString current_weatherDesc() const;
+   QString current_weatherDescCN() const;
 
 signals:
     void loadFinished(QNetworkReply *reply);
@@ -22,7 +25,7 @@ signals:
 private:
     QJsonObject weatherData;
     QJsonObject currentWeatherData;
-    QString url = "https://wttr.in/?format=j1";
+    QString url = "https://wttr.in/";
 };
 
 #endif // WEATHERINFORMATION_H

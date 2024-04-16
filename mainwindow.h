@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QJsonArray>
 
+#include "weatherinformation.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -23,6 +25,7 @@ private:
     QTimer *sentence;
     QTimer *systemResourceUpdater;
     QTimer *weatherUpdater;
+    WeatherInformation *information;
     long m_cpuAll;
     long m_cpuFree;
     void UpdateInformation();

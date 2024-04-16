@@ -15,16 +15,9 @@ WeatherInformation::WeatherInformation()
 
 void WeatherInformation::LoadInformation()
 {
-    QUrl url("https://v1.hitokoto.cn/?c=d&c=i&c=k");
+    QUrl url(this->url);
     QUrlQuery query;
-    query.addQueryItem("type", "DESKDICT");
-    query.addQueryItem("c", "d");
-    query.addQueryItem("c", "i");
-    query.addQueryItem("c", "k");
-    query.addQueryItem("num", "4");
-    query.addQueryItem("ver", "2.0");
-    query.addQueryItem("le", "eng");
-    query.addQueryItem("doctype", "json");
+    query.addQueryItem("format", "j1");
     url.setQuery(query.toString(QUrl::FullyEncoded));
     qDebug() << url;
     QNetworkRequest request(url);
@@ -32,7 +25,9 @@ void WeatherInformation::LoadInformation()
     QNetworkReply *reply = m_http->get(request);
     connect(reply, &QNetworkReply::finished, this, [this, m_http](){
         QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-        this->weatherData = QJsonDocument::fromJson(reply->readAll()).object();
+        QByteArray data = reply->readAll();
+        qDebug() << data;
+        this->weatherData = QJsonDocument::fromJson(data).object();
         this->currentWeatherData = GetCurrentWeatherData();
         emit loadFinished(reply);
     });
