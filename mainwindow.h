@@ -22,6 +22,7 @@ private:
     QTimer *dataUpdate;
     QTimer *sentence;
     QTimer *systemResourceUpdater;
+    QTimer *weatherUpdater;
     long m_cpuAll;
     long m_cpuFree;
     void UpdateInformation();

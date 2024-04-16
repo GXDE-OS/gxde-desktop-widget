@@ -68,6 +68,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(sentence, &QTimer::timeout, this, &MainWindow::UpdateSentence);
     sentence->start();
 
+    // 天气显示
+    weatherUpdater = new QTimer();
+    weatherUpdater->setInterval(60 * 60 * 1000);
+    weatherUpdater->start();
+
     ui->clockDrawing->installEventFilter(this);
 
     // 读取离线词库
@@ -108,9 +113,9 @@ void MainWindow::UpdateSystemDeviceResouce()
     long cpuFree = 0;
     infoUtils::cpuRate(cpuAll, cpuFree);
     ui->m_cpuProgressBar->setValue((((cpuAll - m_cpuAll) - (cpuFree - m_cpuFree)) * 100.0 / (cpuAll - m_cpuAll)));
-
     m_cpuAll = cpuAll;
     m_cpuFree = cpuFree;
+
     // 内存
     long memory = 0;
     long memoryAll = 0;
