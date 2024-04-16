@@ -61,5 +61,6 @@
         <file>icon/Simple/50d.png</file>
         <file>icon/Simple/50n.png</file>
         <file>icon/Simple/na.png</file>
+        <file>icon/custom.png</file>
     </qresource>
 </RCC>

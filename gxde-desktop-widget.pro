@@ -11,11 +11,13 @@ CONFIG += c++17
 SOURCES += \
     infoutils.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    weatherinformation.cpp
 
 HEADERS += \
     infoutils.h \
-    mainwindow.h
+    mainwindow.h \
+    weatherinformation.h
 
 FORMS += \
     mainwindow.ui
