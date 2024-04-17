@@ -88,7 +88,14 @@ MainWindow::MainWindow(QWidget *parent)
     // 天气显示
     information = new WeatherInformation();
     connect(information, &WeatherInformation::loadFinished, this, [this](){
-         ui->m_weatherShower->setText("<img src='" + this->information->current_weatherIconUrl() + "'>");
+        QString weatherNameCN = this->information->current_weatherDescCN();
+        if (weatherNameCN == NULL) {
+            ui->m_weatherShower->setToolTip(this->information->current_weatherDesc());
+        }
+        else {
+            ui->m_weatherShower->setToolTip(weatherNameCN);
+        }
+        ui->m_weatherShower->setText("<img src='" + this->information->current_weatherIconUrl() + "'>");
     });
     weatherUpdater = new QTimer();
     weatherUpdater->setInterval(60 * 60 * 1000);
