@@ -73,11 +73,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(sentence, &QTimer::timeout, this, &MainWindow::UpdateSentence);
     sentence->start();
 
-    // 天气显示
-    weatherUpdater = new QTimer();
-    weatherUpdater->setInterval(60 * 60 * 1000);
-    weatherUpdater->start();
-
     ui->clockDrawing->installEventFilter(this);
 
     // 读取离线词库
@@ -90,11 +85,17 @@ MainWindow::MainWindow(QWidget *parent)
     UpdateSystemDeviceResouce();
     UpdateSentence();
 
+    // 天气显示
     information = new WeatherInformation();
     connect(information, &WeatherInformation::loadFinished, this, [this](){
-         qDebug() << this->information->current_weatherDesc();
          ui->m_weatherShower->setText("<img src='" + this->information->current_weatherIconUrl() + "'>");
     });
+    weatherUpdater = new QTimer();
+    weatherUpdater->setInterval(60 * 60 * 1000);
+    connect(weatherUpdater, &QTimer::timeout, this, [this](){
+        this->information->LoadInformation();
+    });
+    weatherUpdater->start();
     information->LoadInformation();
 
 }
