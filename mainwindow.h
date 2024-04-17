@@ -5,6 +5,7 @@
 #include <QJsonArray>
 
 #include "weatherinformation.h"
+#include "infoutils.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,6 +29,10 @@ private:
     WeatherInformation *information;
     long m_cpuAll;
     long m_cpuFree;
+    long m_down;
+    long m_upload;
+    int m_DecimalsNum = 2;
+    infoUtils::Sensitive m_Sensitive = infoUtils::Sensitive::Default;
     void UpdateInformation();
     void DrawingClock();
     void UpdateTime();

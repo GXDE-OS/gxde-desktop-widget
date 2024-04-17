@@ -16,6 +16,7 @@
 
 // 用于获取系统硬件占用率
 #include "infoutils.h"
+#include <QNetworkInterface>
 
 // 用于钟表绘制
 #include <QPainter>
@@ -92,9 +93,10 @@ MainWindow::MainWindow(QWidget *parent)
     information = new WeatherInformation();
     connect(information, &WeatherInformation::loadFinished, this, [this](){
          qDebug() << this->information->current_weatherDesc();
-         //QMessageBox::information(NULL, "a", this->information->current_weatherDesc());
+         ui->m_weatherShower->setText("<img src='" + this->information->current_weatherIconUrl() + "'>");
     });
     information->LoadInformation();
+
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
@@ -133,6 +135,27 @@ void MainWindow::UpdateSystemDeviceResouce()
     long swapAll = 0;
     infoUtils::memoryRate(memory, memoryAll, swap, swapAll);
     ui->m_memoryProgressBar->setValue(memory * 100.0 / memoryAll);
+
+    // 网速
+    long down = 0;
+    long upload = 0;
+    double downRate = 0;
+    double uploadRate = 0;
+        infoUtils::RateUnit unit = infoUtils::RateByte;
+
+    infoUtils::netRate(down, upload);
+    downRate = infoUtils::autoRateUnits((down - m_down) / (systemResourceUpdater->interval() / 1000), unit);
+    QString downUnit = infoUtils::setRateUnitSensitive(unit, m_Sensitive);
+    unit = infoUtils::RateByte;
+    uploadRate = infoUtils::autoRateUnits((upload - m_upload) / (systemResourceUpdater->interval() / 1000), unit);
+    QString uploadUnit = infoUtils::setRateUnitSensitive(unit, m_Sensitive);
+
+    ui->m_netInfo->setText("Net: " +
+                           QString::number(downRate) + downUnit +
+                           " " + QString::number(uploadRate) + uploadUnit);
+
+    m_down = down;
+    m_upload = upload;
 }
 
 void MainWindow::UpdateTime()

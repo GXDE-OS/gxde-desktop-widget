@@ -27,6 +27,7 @@ void WeatherInformation::LoadInformation()
         QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
         QByteArray data = reply->readAll();
         qDebug() << data;
+        qDebug() << reply->error();
         this->weatherData = QJsonDocument::fromJson(data).object();
         this->currentWeatherData = GetCurrentWeatherData();
         emit loadFinished(reply);
@@ -71,4 +72,18 @@ QString WeatherInformation::current_weatherDescCN() const
         return NULL;
     }
     return currentWeatherData.value("lang_zh").toArray().at(0).toObject().value("value").toString();
+}
+
+QString WeatherInformation::current_weatherIconUrl() const
+{
+    QString weatherName = this->current_weatherDesc();
+    QString weatherNameKey = "unknown";
+    foreach (QString name, this->weatherNameKey) {
+        if (weatherName.contains(name)) {
+            weatherNameKey = name;
+            break;
+        }
+    }
+    QString weatherID = this->weatherIconID.value(weatherNameKey);
+    return ":/icon/Simple/" + weatherID + "d.png";
 }

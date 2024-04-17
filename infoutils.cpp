@@ -6,9 +6,36 @@
 #include <QTextStream>
 #include <QtMath>
 
+#include <QHostAddress>
+#include <QNetworkInterface>
+
 infoUtils::infoUtils(QObject *parent) : QObject(parent)
 {
 
+}
+
+QString infoUtils::GetIPV4() const
+{
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    QString ip = "127.0.0.1";
+    foreach (QHostAddress address, list) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol) {
+            ip = address.toString();
+        }
+    }
+    return ip;
+}
+
+QString infoUtils::GetIPV6() const
+{
+    QList<QHostAddress> list = QNetworkInterface::allAddresses();
+    QString ip = "127.0.0.1";
+    foreach (QHostAddress address, list) {
+        if (address.protocol() == QAbstractSocket::IPv6Protocol) {
+            ip = address.toString();
+        }
+    }
+    return ip;
 }
 
 QString infoUtils::setRateUnitSensitive(infoUtils::RateUnit unit, infoUtils::Sensitive sensitive)

@@ -82,6 +82,13 @@
       </item>
      </layout>
     </item>
+    <item>
+     <widget class="QLabel" name="m_netInfo">
+      <property name="text">
+       <string>Net:</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>

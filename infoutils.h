@@ -42,6 +42,9 @@ public:
     static void cpuRate(long &cpuAll, long &cpuFree);
     static void memoryRate(long &memory, long &memoryAll, long &swap, long &swapAll);
 
+    QString GetIPV4() const;
+    QString GetIPV6() const;
+
 signals:
 
 public slots:
