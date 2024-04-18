@@ -19,6 +19,7 @@ public:
    QString current_weatherDesc() const;
    QString current_weatherDescCN() const;
    QString current_weatherIconUrl() const;
+   QString nearest_area_areaName() const;
 
 signals:
     void loadFinished(QNetworkReply *reply);

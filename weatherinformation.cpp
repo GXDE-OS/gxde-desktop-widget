@@ -74,6 +74,38 @@ QString WeatherInformation::current_weatherDescCN() const
     return currentWeatherData.value("lang_zh").toArray().at(0).toObject().value("value").toString();
 }
 
+QString WeatherInformation::nearest_area_areaName() const
+{
+    /*"nearest_area": [
+        {
+            "areaName": [
+                {
+                    "value": "Guangzhou"
+                }
+            ],
+            "country": [
+                {
+                    "value": "China"
+                }
+            ],
+            "latitude": "23.117",
+            "longitude": "113.250",
+            "population": "3152825",
+            "region": [
+                {
+                    "value": "Guangdong"
+                }
+            ],
+            "weatherUrl": [
+                {
+                    "value": ""
+                }
+            ]
+        }
+    ],*/
+    return weatherData.value("nearest_area").toArray().at(0).toObject().value("areaName").toArray().at(0).toObject().value("value").toString();
+}
+
 QString WeatherInformation::current_weatherIconUrl() const
 {
     QString weatherName = this->current_weatherDesc();

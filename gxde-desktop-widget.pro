@@ -9,17 +9,20 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    aboutprogram.cpp \
     infoutils.cpp \
     main.cpp \
     mainwindow.cpp \
     weatherinformation.cpp
 
 HEADERS += \
+    aboutprogram.h \
     infoutils.h \
     mainwindow.h \
     weatherinformation.h
 
 FORMS += \
+    aboutprogram.ui \
     mainwindow.ui
 
 TRANSLATIONS += \

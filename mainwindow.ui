@@ -37,7 +37,7 @@
       <item>
        <widget class="QLabel" name="m_weatherShower">
         <property name="text">
-         <string>TextLabel</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/icon/Simple/03d.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>

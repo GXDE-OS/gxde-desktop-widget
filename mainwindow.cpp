@@ -39,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setAttribute(Qt::WA_TranslucentBackground, true); // 设置窗口透明
+    this->setStyleSheet("Color: white;");  // 先设置字体颜色防止出现浅色主题字体问题
 
     // 隐藏标题栏
     this->setWindowFlags(Qt::FramelessWindowHint);
@@ -73,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(sentence, &QTimer::timeout, this, &MainWindow::UpdateSentence);
     sentence->start();
 
+    this->installEventFilter(this);
     ui->clockDrawing->installEventFilter(this);
 
     // 读取离线词库
@@ -89,11 +92,15 @@ MainWindow::MainWindow(QWidget *parent)
     information = new WeatherInformation();
     connect(information, &WeatherInformation::loadFinished, this, [this](){
         QString weatherNameCN = this->information->current_weatherDescCN();
+        QString cityName = this->information->nearest_area_areaName();
+        if (cityName == "") {
+            cityName = "Unknown";
+        }
         if (weatherNameCN == NULL) {
-            ui->m_weatherShower->setToolTip(this->information->current_weatherDesc());
+            ui->m_weatherShower->setToolTip("City: " + cityName + "\n" + this->information->current_weatherDesc());
         }
         else {
-            ui->m_weatherShower->setToolTip(weatherNameCN);
+            ui->m_weatherShower->setToolTip("City: " + cityName + "\n" + weatherNameCN);
         }
         ui->m_weatherShower->setText("<img src='" + this->information->current_weatherIconUrl() + "'>");
     });
@@ -108,7 +115,13 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
-    qDebug() << ui->clockDrawing << event->type();
+    // 绘制透明窗口
+    QPainter p(this);
+    QColor backgroundColor = QColor(0, 0, 0, 150);
+    p.setPen(backgroundColor);
+    p.setBrush(backgroundColor);
+    p.drawRect(this->rect());
+    // 绘制钟表
     if (watched == ui->clockDrawing && event->type() == QEvent::Resize) {
         DrawingClock();
     }
@@ -159,8 +172,8 @@ void MainWindow::UpdateSystemDeviceResouce()
     QString uploadUnit = infoUtils::setRateUnitSensitive(unit, m_Sensitive);
 
     ui->m_netInfo->setText("Net: " +
-                           QString::number(downRate) + downUnit +
-                           " " + QString::number(uploadRate) + uploadUnit);
+                           QString::number(downRate, 'f', 2) + downUnit +
+                           " " + QString::number(uploadRate, 'f', 2) + uploadUnit);
 
     m_down = down;
     m_upload = upload;
