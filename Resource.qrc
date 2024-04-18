@@ -21,7 +21,6 @@
         <file>icon/Default/13n.png</file>
         <file>icon/Default/50d.png</file>
         <file>icon/Default/50n.png</file>
-        <file>icon/Default/na.png</file>
         <file>icon/Flat/01d.png</file>
         <file>icon/Flat/01n.png</file>
         <file>icon/Flat/02d.png</file>
@@ -40,8 +39,6 @@
         <file>icon/Flat/13n.png</file>
         <file>icon/Flat/50d.png</file>
         <file>icon/Flat/50n.png</file>
-        <file>icon/Flat/na.png</file>
-        <file>icon/Flat/README.md</file>
         <file>icon/Simple/01d.png</file>
         <file>icon/Simple/01n.png</file>
         <file>icon/Simple/02d.png</file>
@@ -60,7 +57,12 @@
         <file>icon/Simple/13n.png</file>
         <file>icon/Simple/50d.png</file>
         <file>icon/Simple/50n.png</file>
-        <file>icon/Simple/na.png</file>
         <file>icon/custom.png</file>
+        <file>icon/Simple/nad.png</file>
+        <file>icon/Simple/nan.png</file>
+        <file>icon/Default/nad.png</file>
+        <file>icon/Default/nan.png</file>
+        <file>icon/Flat/nad.png</file>
+        <file>icon/Flat/nan.png</file>
     </qresource>
 </RCC>

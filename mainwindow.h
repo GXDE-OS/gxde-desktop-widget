@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QJsonArray>
+#include <QMouseEvent>
+#include <QMenu>
 
 #include "weatherinformation.h"
 #include "infoutils.h"
@@ -47,5 +49,8 @@ private:
     // 数学计算
     QList<int> GetCoordinateOnCircularArc(double angle, double r);
     double DegreeToRadian(double degree);
+    // 右键菜单实现
+    QMenu *m_mainMenu;
+    void mousePressEvent(QMouseEvent *event);
 };
 #endif // MAINWINDOW_H

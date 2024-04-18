@@ -42,8 +42,15 @@ MainWindow::MainWindow(QWidget *parent)
     this->setAttribute(Qt::WA_TranslucentBackground, true); // 设置窗口透明
     this->setStyleSheet("Color: white;");  // 先设置字体颜色防止出现浅色主题字体问题
 
+    // 实现右键菜单
+    m_mainMenu = new QMenu();
+    QAction *m_exitAction = new QAction(tr("Exit"));
+    connect(m_exitAction, &QAction::triggered, this, &MainWindow::close);
+    m_mainMenu->addAction(m_exitAction);
+
+
     // 隐藏标题栏
-    this->setWindowFlags(Qt::FramelessWindowHint);
+    this->setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip);
 
     // 获取屏幕分辨率以设置窗口大小
     QScreen *screen = QGuiApplication::primaryScreen();  // 读取主窗口的分辨率
@@ -112,6 +119,16 @@ MainWindow::MainWindow(QWidget *parent)
     weatherUpdater->start();
     information->LoadInformation();
 
+}
+
+// 右键菜单
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton) {
+        // 显示右键菜单
+        m_mainMenu->exec(event->globalPos());
+    }
+    QWidget::mousePressEvent(event);
 }
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
