@@ -52,5 +52,7 @@ private:
     // 右键菜单实现
     QMenu *m_mainMenu;
     void mousePressEvent(QMouseEvent *event);
+    void ShowAboutWindow();
+    void ShowSettingWindow();
 };
 #endif // MAINWINDOW_H

@@ -13,17 +13,20 @@ SOURCES += \
     infoutils.cpp \
     main.cpp \
     mainwindow.cpp \
+    settingwindow.cpp \
     weatherinformation.cpp
 
 HEADERS += \
     aboutprogram.h \
     infoutils.h \
     mainwindow.h \
+    settingwindow.h \
     weatherinformation.h
 
 FORMS += \
     aboutprogram.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    settingwindow.ui
 
 TRANSLATIONS += \
     gxde-desktop-widget_zh_CN.ts

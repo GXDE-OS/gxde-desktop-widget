@@ -31,6 +31,9 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+#include "aboutprogram.h"
+#include "settingwindow.h"
+
 #define WindowWidthProportion 4
 #define WindowHeightProportion 4
 
@@ -44,8 +47,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 实现右键菜单
     m_mainMenu = new QMenu();
+    QAction *m_aboutAction = new QAction(tr("About"));
+    QAction *m_settingAction = new QAction(tr("Setting"));
     QAction *m_exitAction = new QAction(tr("Exit"));
+    connect(m_aboutAction, &QAction::triggered, this, &MainWindow::ShowAboutWindow);
+    connect(m_settingAction, &QAction::triggered, this, &MainWindow::ShowSettingWindow);
     connect(m_exitAction, &QAction::triggered, this, &MainWindow::close);
+    m_mainMenu->addAction(m_aboutAction);
+    m_mainMenu->addAction(m_settingAction);
+    m_mainMenu->addSeparator();
     m_mainMenu->addAction(m_exitAction);
 
 
@@ -109,8 +119,9 @@ MainWindow::MainWindow(QWidget *parent)
         else {
             ui->m_weatherShower->setToolTip("City: " + cityName + "\n" + weatherNameCN);
         }
-        ui->m_weatherShower->setText("<img src='" + this->information->current_weatherIconUrl() + "'>");
+        ui->m_weatherShower->setText("<a href='https://wttr.in'><img src='" + this->information->current_weatherIconUrl() + "'></a>");
     });
+    ui->m_weatherShower->setOpenExternalLinks(true);
     weatherUpdater = new QTimer();
     weatherUpdater->setInterval(60 * 60 * 1000);
     connect(weatherUpdater, &QTimer::timeout, this, [this](){
@@ -366,6 +377,18 @@ void MainWindow::ShowPoemText(QJsonValue hitokoto, QJsonValue from, QJsonValue f
     }
     showText += who + "</p>";
     ui->sentenceText->setText(showText);
+}
+
+void MainWindow::ShowAboutWindow()
+{
+    AboutProgram *program = new AboutProgram(this);
+    program->show();
+}
+
+void MainWindow::ShowSettingWindow()
+{
+    SettingWindow *setting = new SettingWindow(this);
+    setting->show();
 }
 
 MainWindow::~MainWindow()

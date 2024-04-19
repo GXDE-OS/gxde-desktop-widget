@@ -15,6 +15,9 @@ public:
     explicit AboutProgram(QWidget *parent = nullptr);
     ~AboutProgram();
 
+private slots:
+    void on_m_OK_clicked();
+
 private:
     Ui::AboutProgram *ui;
 };
